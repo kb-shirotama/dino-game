@@ -66,7 +66,7 @@ function createDino() {
 }
 
 function moveDino() {
-  game.dino.y += game.dino.y;
+  game.dino.y += game.dino.moveY;
   if (game.dino.y >= canvas.height - game.dino.height / 2) {
     game.dino.y = canvas.height - game.dino.height / 2;
     game.dino.moveY = 0;
