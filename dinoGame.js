@@ -41,10 +41,10 @@ function ticker() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // 敵キャラクタの生成
-  if(Math.floor(Math.random() * 100) === 0){
+  if (Math.floor(Math.random() * (100 - game.score / 100)) === 0) {
     createCactus();
   }
-  if(Math.floor(Math.random() * 200) === 0){
+  if (Math.floor(Math.random() * (200 - game.score / 100)) === 0) {
     createBird();
   }
 
@@ -55,11 +55,13 @@ function ticker() {
   // 描画
   drawDino();// 恐竜の描画
   drawEnemys(); // 敵キャラクタの描画
+  drawScore(); //点数の描画
 
   // あたり判定
   hitCheck();
 
   // カウンタの更新
+  game.score += 1;
   game.counter = (game.counter + 1) % 1000000;
 }
 
@@ -74,7 +76,7 @@ function createDino() {
   }
 }
 
-function createCactus(){
+function createCactus() {
   game.enemys.push({
     x: canvas.width + game.image.cactus.width / 2, // ゲーム端から登場
     y: canvas.height - game.image.cactus.height / 2, // 地面に接地
@@ -82,18 +84,18 @@ function createCactus(){
     height: game.image.cactus.height,
     moveX: -10, // 移動速度
     image: game.image.cactus
-});
+  });
 }
 
-function createBird(){
+function createBird() {
   const birdY = Math.random() * (300 - game.image.bird.height) + 150; // ランダムな高さ
   game.enemys.push({
-      x: canvas.width + game.image.bird.width / 2,
-      y: birdY,
-      width: game.image.bird.width,
-      height: game.image.bird.height,
-      moveX: -15, // 移動速度、サボテンより速い
-      image: game.image.bird
+    x: canvas.width + game.image.bird.width / 2,
+    y: birdY,
+    width: game.image.bird.width,
+    height: game.image.bird.height,
+    moveX: -15, // 移動速度、サボテンより速い
+    image: game.image.bird
   });
 }
 
@@ -107,8 +109,8 @@ function moveDino() {
   }
 }
 
-function moveEnemys(){
-  for(const enemy of game.enemys){
+function moveEnemys() {
+  for (const enemy of game.enemys) {
     enemy.x += enemy.moveX;
   }
   // 画面外に出たキャラクタを配列から削除
@@ -119,29 +121,37 @@ function drawDino() {
   ctx.drawImage(
     game.image.dino, game.dino.x - game.dino.width / 2,
     game.dino.y - game.dino.height / 2
-    );
+  );
 } // 恐竜の中心座標ではなく左上の座標を示す
 
-function drawEnemys(){
-  for(const enemy of game.enemys){
+function drawEnemys() {
+  for (const enemy of game.enemys) {
     ctx.drawImage(enemy.image,
       enemy.x - enemy.width / 2,
       enemy.y - enemy.height / 2);
   }
 }
 
+function drawScore() {
+  ctx.font = '24px serif';
+  ctx.fillText(`score：${game.score}`, 0, 30);
+}
+
 document.onkeydown = (e) => {
   if (e.key === ' ' && game.dino.moveY === 0) {
     game.dino.moveY = -41;
   }
+  if (e.key === 'Enter' && game.isGameOver === true) {
+    init();
+  }
 };
 
-function hitCheck(){
-  for(const enemy of game.enemys){
-    if(
+function hitCheck() {
+  for (const enemy of game.enemys) {
+    if (
       Math.abs(game.dino.x - enemy.x) < game.dino.width * 0.7 / 2 + enemy.width * 0.9 / 2 &&
       Math.abs(game.dino.y - enemy.y) < game.dino.height * 0.5 / 2 + enemy.height * 0.9 / 2
-    ){
+    ) {
       game.isGameOver = true;
       ctx.font = 'bold 100px serif';
       ctx.fillText('Game Over!', 150, 200);
